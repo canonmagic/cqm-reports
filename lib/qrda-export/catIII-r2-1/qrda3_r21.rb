@@ -17,11 +17,13 @@ class Qrda3R21 < Mustache
     end
     @aggregate_results.each do |hqmf_id, measure_aggregate_result|
       measure_aggregate_result.each do |_key, aggregate_result|
-        @measure_result_hash[hqmf_id].measure_data << aggregate_result
+        # FIX, CHANGED DOT SYNTAX TO SYMBOL
+        @measure_result_hash[hqmf_id][:measure_data] << aggregate_result
       end
     end
     @measure_result_hash.each do |key, hash|
-      @measure_result_hash[key][:aggregate_count] = agg_results(key, hash.measure_data, hash.population_sets)
+      # FIX, CHANGED DOT SYNTAX TO SYMBOL
+      @measure_result_hash[key][:aggregate_count] = agg_results(key, hash[:measure_data], hash[:population_sets])
     end
     @provider = options[:provider]
     @performance_period_start = options[:start_time]
