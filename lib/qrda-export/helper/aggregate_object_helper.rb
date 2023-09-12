@@ -106,20 +106,24 @@ module Qrda
         end
 
         def add_entry(cache_entry, population_sets)
-          population_set = population_sets.where(population_set_id: cache_entry.pop_set_hash[:population_set_id]).first
+          # DOT SYNTAX REPLACEMENT
+          population_set = population_sets.where(population_set_id: cache_entry["pop_set_hash"][:population_set_id]).first
           entry_populations = []
           %w[IPP DENOM NUMER NUMEX DENEX DENEXCEP MSRPOPL MSRPOPLEX].each do |pop_code|
             next unless population_set.populations[pop_code]
 
             population = create_population_from_population_set(pop_code, population_set, cache_entry)
-            if cache_entry.pop_set_hash[:stratification_id]
-              strat_id = population_set.stratifications.where(stratification_id: cache_entry.pop_set_hash[:stratification_id]).first&.hqmf_id
+            # DOT SYNTAX REPLACEMENT
+            if cache_entry["pop_set_hash"][:stratification_id]
+              # DOT SYNTAX REPLACEMENT
+              strat_id = population_set.stratifications.where(stratification_id: cache_entry["pop_set_hash"][:stratification_id]).first["hqmf_id"]
               observation = cache_entry['observations'][pop_code] if cache_entry['observations'] && cache_entry['observations'][pop_code]
               population.add_stratification(strat_id,cache_entry[pop_code], observation)
             else
               population.value = cache_entry[pop_code]
               population.observation = cache_entry['observations'][pop_code] if cache_entry['observations'] && cache_entry['observations'][pop_code]
-              population.supplemental_data = cache_entry.supplemental_data[pop_code]
+              # DOT SYNTAX REPLACEMENT
+              population.supplemental_data = cache_entry["supplemental_data"][pop_code]
             end
             entry_populations << population if population
           end
@@ -131,12 +135,14 @@ module Qrda
         end
 
         def create_population_from_population_set(pop_code, population_set, cache_entry)
-          population = populations.find { |pop| pop.id == population_set.populations[pop_code]&.hqmf_id } if pop_code != 'STRAT'
-          return population unless population.nil? && !cache_entry.pop_set_hash[:stratification_id]
+          population = populations.find { |pop| pop.id == population_set.populations[pop_code]["hqmf_id"] } if pop_code != 'STRAT'
+          # DOT SYNTAX REPLACEMENT
+          return population unless population.nil? && !cache_entry["pop_set_hash"][:stratification_id]
 
           population = Population.new
           population.type = pop_code
-          population.id = population_set.populations[pop_code]&.hqmf_id
+          # DOT SYNTAX REPLACEMENT
+          population.id = population_set.populations[pop_code]["hqmf_id"]
           populations << population
           population
         end
