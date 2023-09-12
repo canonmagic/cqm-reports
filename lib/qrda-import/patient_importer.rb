@@ -60,7 +60,7 @@ module QRDA
 
       def parse_cat1(doc)
         add_conditional_importers(doc)
-        patient = CQM::Patient.new
+        patient = Patient.new
         warnings = []
         codes = Set.new
         codes_modifiers = {}
